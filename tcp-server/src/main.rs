@@ -194,7 +194,7 @@ impl HttpRequest {
     }
 
     fn test() {
-        HttpRequest::new(HttpMethod::Get, "/", Some([]), None) //be able to pass arr ([]) or String as well?
+        HttpRequest::new(HttpMethod::Get, "/".to_string(), Some(vec![]), None); //be able to pass arr ([]) or String as well?
     }
 
     fn new(
@@ -301,6 +301,7 @@ fn handle_connection(mut stream: TcpStream) {
         HttpRequest {
             method: HttpMethod::Get,
             path: p,
+            parameters: _,
             body: _,
         } => match p.as_str() {
             "/" => gen_res("index.html"),
