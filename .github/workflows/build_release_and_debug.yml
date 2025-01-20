@@ -1,0 +1,17 @@
+name: Build release and upload
+on:
+    workflow_call
+permissions:
+    contents: read
+jobs:
+    build-release-and-debug:
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout code
+            uses: actions/checkout@v4
+          - name: Build release verbosely
+            run: cargo build --release --verbose
+            working-directory: ./tcp_server
+          - name: Build debug verbosely
+            run: cargo build --verbose
+            working-directory: ./tcp_server

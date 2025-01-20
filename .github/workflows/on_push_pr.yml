@@ -1,0 +1,10 @@
+name: Run workflows on push and pull request
+
+on:
+    push:
+        branches: '*'
+    pull_request:
+
+jobs:
+    build-release:
+        uses: ./.github/workflows/build_release_and_debug.yml
