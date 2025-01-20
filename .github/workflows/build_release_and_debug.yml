@@ -11,7 +11,7 @@ jobs:
             uses: actions/checkout@v4
           - name: Build release verbosely
             run: cargo build --release --verbose
-            working-directory: ./tcp_server
+            working-directory: ./tcp-server
           - name: Build debug verbosely
             run: cargo build --verbose
-            working-directory: ./tcp_server
+            working-directory: ./tcp-server
