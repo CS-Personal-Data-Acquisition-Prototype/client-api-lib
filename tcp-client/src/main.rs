@@ -123,6 +123,45 @@ async fn view_user_by_username() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
+async fn update_user() -> Result<(), Box<dyn std::error::Error>> {
+    let username = "username";
+    let password = "workingpassword";
+
+    let hashed = hash_pw(password.as_bytes());
+    let params = UserPassword {
+        username: username.to_string(),
+        password_hash: hashed,
+    };
+
+    let api_base = Url::parse(format!("http://127.0.0.1:7878/users/{username}").as_str())?;
+
+    let client = Client::new();
+    let res: serde_json::Value = client
+        .patch(api_base)
+        .header(CONTENT_TYPE, HeaderValue::from_static("application/json"))
+        .json(&params)
+        .send()
+        .await?
+        .json()
+        .await?;
+
+    println!("{:#?}", res);
+
+    Ok(())
+}
+
+async fn delete_user() -> Result<(), Box<dyn std::error::Error>> {
+    let username = "username";
+    let api_base = Url::parse(format!("http://127.0.0.1:7878/users/{username}").as_str())?;
+
+    let client = Client::new();
+    let res: serde_json::Value = client.delete(api_base).send().await?.json().await?;
+
+    println!("{:#?}", res);
+
+    Ok(())
+}
+
 #[tokio::main]
 async fn main() {
     // let client = Client::new();
