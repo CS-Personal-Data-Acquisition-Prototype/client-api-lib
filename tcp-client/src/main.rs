@@ -3,25 +3,21 @@ use argon2::{
     Argon2,
 };
 use reqwest::{
-    header::{HeaderValue, CONTENT_TYPE},
+    header::{HeaderName, HeaderValue, CONTENT_TYPE},
     Client, Url,
 };
 use serde::Serialize;
 use serde_json;
+use std::error::Error;
 use tokio;
 
 // TODO: Find out how to not make a new Client every time
-// TODO: Cookie jar implementation
+// TODO: Cookie jar implementation and add session ID to HTTP header
 
 #[derive(Debug, Serialize)]
 struct UserPassword {
     username: String,
     password_hash: String,
-}
-
-#[derive(Debug, Serialize)]
-struct SessionId {
-    session_id: String,
 }
 
 // Passwords cannot be same as username or less than ten characters long
@@ -44,90 +40,82 @@ fn hash_pw(password: &[u8]) -> String {
     }
 }
 
-async fn create_user() -> Result<(), reqwest::Error> {
-    let username = "username";
-    let password = "workingpassword";
-
-    if !valid_password(username, password) {
+async fn create_user(client: &Client, username: &str, pw: &str) -> Result<(), Box<dyn Error>> {
+    if !valid_password(username, pw) {
         // TODO: Should display password issues in GUI
         panic!("Invalid password");
     }
 
-    let hashed = hash_pw(password.as_bytes());
+    let hashed = hash_pw(pw.as_bytes());
     let params = UserPassword {
         username: username.to_string(),
         password_hash: hashed,
     };
 
-    let client = Client::new();
-    let res: serde_json::Value = client
+    // let client = Client::new();
+    let res = client
         .post("http://127.0.0.1:7878/users")
         .header(CONTENT_TYPE, HeaderValue::from_static("application/json"))
         .json(&params)
         .send()
-        .await?
-        .json()
         .await?;
 
-    println!("{:#?}", res);
+    println!("Response status: {}", res.status());
+
+    let json: serde_json::Value = res.json().await?;
+    let json_string = serde_json::to_string_pretty(&json).unwrap();
+    println!("{}", json_string);
 
     Ok(())
 }
 
-async fn view_all_users() -> Result<(), reqwest::Error> {
-    let client = Client::new();
-    let res: serde_json::Value = client
-        .get("http://127.0.0.1:7878/users")
-        .send()
-        .await?
-        .json()
-        .await?;
+async fn view_all_users(client: &Client) -> Result<(), Box<dyn Error>> {
+    let res = client.get("http://127.0.0.1:7878/users").send().await?;
 
-    println!("{:#?}", res);
+    println!("Response status: {}", res.status());
+
+    let json: serde_json::Value = res.json().await?;
+    let json_string = serde_json::to_string_pretty(&json).unwrap();
+    println!("{}", json_string);
 
     Ok(())
 }
 
-async fn view_user_profile() -> Result<(), reqwest::Error> {
-    // TODO: Should be getting this from stored cookies?
-    let session_id = String::from("skdfj");
-    let params = SessionId {
-        session_id: session_id,
-    };
-
-    let client = Client::new();
-    let res: serde_json::Value = client
+// TODO: Should be storing session id somewhere
+async fn view_user_profile(client: &Client, session_id: &str) -> Result<(), Box<dyn Error>> {
+    let res = client
         .get("http://127.0.0.1:7878/users/profile")
-        .header(CONTENT_TYPE, HeaderValue::from_static("application/json"))
-        .json(&params)
+        .header(
+            HeaderName::from_static("session_id"),
+            HeaderValue::from_str(session_id)?,
+        )
         .send()
-        .await?
-        .json()
         .await?;
 
-    println!("{:#?}", res);
+    println!("Response status: {}", res.status());
+
+    let json: serde_json::Value = res.json().await?;
+    let json_string = serde_json::to_string_pretty(&json).unwrap();
+    println!("{}", json_string);
 
     Ok(())
 }
 
-// Fix error part of Result
-async fn view_user_by_username() -> Result<(), Box<dyn std::error::Error>> {
-    let username = "username";
+async fn view_user_by_username(client: &Client, username: &str) -> Result<(), Box<dyn Error>> {
     let api_base = Url::parse(format!("http://127.0.0.1:7878/users/{username}").as_str())?;
+    let res = client.get(api_base).send().await?;
 
-    let client = Client::new();
-    let res: serde_json::Value = client.get(api_base).send().await?.json().await?;
+    println!("Response status: {}", res.status());
 
-    println!("{:#?}", res);
+    let json: serde_json::Value = res.json().await?;
+    let json_string = serde_json::to_string_pretty(&json).unwrap();
+    println!("{}", json_string);
 
     Ok(())
 }
 
-async fn update_user() -> Result<(), Box<dyn std::error::Error>> {
-    let username = "username";
-    let password = "workingpassword";
-
-    let hashed = hash_pw(password.as_bytes());
+async fn update_user(client: &Client, username: &str, pw: &str) -> Result<(), Box<dyn Error>> {
+    let hashed = hash_pw(pw.as_bytes());
     let params = UserPassword {
         username: username.to_string(),
         password_hash: hashed,
@@ -135,77 +123,42 @@ async fn update_user() -> Result<(), Box<dyn std::error::Error>> {
 
     let api_base = Url::parse(format!("http://127.0.0.1:7878/users/{username}").as_str())?;
 
-    let client = Client::new();
-    let res: serde_json::Value = client
+    let res = client
         .patch(api_base)
         .header(CONTENT_TYPE, HeaderValue::from_static("application/json"))
         .json(&params)
         .send()
-        .await?
-        .json()
         .await?;
 
-    println!("{:#?}", res);
+    println!("Response status: {}", res.status());
+
+    let json: serde_json::Value = res.json().await?;
+    let json_string = serde_json::to_string_pretty(&json).unwrap();
+    println!("{}", json_string);
 
     Ok(())
 }
 
-async fn delete_user() -> Result<(), Box<dyn std::error::Error>> {
-    let username = "username";
+async fn delete_user(client: &Client, username: &str) -> Result<(), Box<dyn Error>> {
     let api_base = Url::parse(format!("http://127.0.0.1:7878/users/{username}").as_str())?;
+    let res = client.delete(api_base).send().await?;
 
-    let client = Client::new();
-    let res: serde_json::Value = client.delete(api_base).send().await?.json().await?;
+    println!("Response status: {}", res.status());
 
-    println!("{:#?}", res);
+    let json: serde_json::Value = res.json().await?;
+    let json_string = serde_json::to_string_pretty(&json).unwrap();
+    println!("{}", json_string);
 
     Ok(())
 }
 
 #[tokio::main]
 async fn main() {
-    // let client = Client::new();
+    let client = Client::new();
 
-    // let response = client
-    //     .get("http://127.0.0.1:7878")
-    //     .send()
-    //     .await
-    //     .expect("Failed to send request");
+    let username = "username";
+    let pw = "working_pw";
 
-    // let _body = response.text().await.expect("Failed to read response body");
-    // println!("Response: {}", body);
-
-    let _res = create_user().await;
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use mockito;
-
-    #[tokio::test]
-    async fn test_create_user() {
-        // let client = Client::new();
-
-        // Create async server on correct port
-        let opts = mockito::ServerOpts {
-            host: "127.0.0.1",
-            port: 7878,
-            ..Default::default()
-        };
-        let mut server = mockito::Server::new_with_opts_async(opts).await;
-
-        let m = server
-            .mock("POST", "/users")
-            .with_body("hiii")
-            .create_async()
-            .await;
-
-        let res = create_user().await;
-
-        // Note: Will print reqwest error because body is not json
-        m.assert_async().await;
-        println!("{m:#?}");
-        println!("{:#?}", res);
-    }
+    let mut _res = create_user(&client, username, pw).await;
+    _res = view_all_users(&client).await;
 }
