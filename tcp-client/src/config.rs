@@ -26,4 +26,16 @@ impl Config {
     pub fn get_username_url(&self, username: &str) -> String {
         format!("{}/users/{}", self.base_url, username)
     }
+
+    pub fn get_login_url(&self) -> String {
+        format!("{}/authentication/login", self.base_url)
+    }
+
+    pub fn get_logout_url(&self) -> String {
+        format!("{}/authentication/logout", self.base_url)
+    }
+
+    pub fn get_renew_url(&self) -> String {
+        format!("{}/authentication/renew", self.base_url)
+    }
 }
