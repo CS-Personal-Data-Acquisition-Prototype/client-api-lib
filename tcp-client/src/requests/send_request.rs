@@ -1,5 +1,5 @@
 use reqwest::{
-    header::{HeaderName, HeaderValue, CONTENT_TYPE},
+    header::{HeaderMap, HeaderValue, CONTENT_TYPE, COOKIE},
     Client, Method,
 };
 use serde::Serialize;
@@ -12,7 +12,7 @@ pub async fn send_request<T>(
     url: &str,
     session_id: Option<&str>,
     body: Option<T>,
-) -> Result<(reqwest::StatusCode, serde_json::Value), Box<dyn Error>>
+) -> Result<(reqwest::StatusCode, Option<serde_json::Value>, HeaderMap), Box<dyn Error>>
 where
     T: Serialize,
 {
@@ -26,8 +26,8 @@ where
     // Add session_id header if provided
     if let Some(session_id) = session_id {
         request = request.header(
-            HeaderName::from_static("session_id"),
-            HeaderValue::from_str(session_id)?,
+            COOKIE,
+            HeaderValue::from_str(&format!("session_id={}", session_id))?,
         );
     }
 
@@ -39,7 +39,13 @@ where
     // Send request and get status code and response body
     let res = request.send().await?;
     let status = res.status();
-    let json: serde_json::Value = res.json().await?;
+    let headers = res.headers().clone();
 
-    Ok((status, json))
+    // Receive json body if not No Content
+    if status != reqwest::StatusCode::NO_CONTENT {
+        let json: serde_json::Value = res.json().await?;
+        Ok((status, Some(json), headers))
+    } else {
+        Ok((status, None, headers))
+    }
 }
