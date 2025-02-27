@@ -38,4 +38,12 @@ impl Config {
     pub fn get_renew_url(&self) -> String {
         format!("{}/authentication/renew", self.base_url)
     }
+
+    pub fn get_sensors_url(&self) -> String {
+        format!("{}/sensors", self.base_url)
+    }
+
+    pub fn sensor_id_url(&self, sensor_id: &str) -> String {
+        format!("{}/sensors/{}", self.base_url, sensor_id)
+    }
 }
