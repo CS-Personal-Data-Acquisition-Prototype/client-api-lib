@@ -62,7 +62,7 @@ pub async fn view_sensor_by_id(
     session_id: &str,
     sensor_id: &str,
 ) -> Result<(), Box<dyn Error>> {
-    let url = &config.sensor_id_url(sensor_id);
+    let url = &config.get_sensor_id_url(sensor_id);
 
     let (status, json, _headers) =
         send_request(client, &Method::GET, url, Some(session_id), None::<()>).await?;
@@ -83,7 +83,7 @@ pub async fn update_sensor(
     sensor_id: &str,
     sensor_type: &str,
 ) -> Result<(), Box<dyn Error>> {
-    let url = &config.sensor_id_url(sensor_id);
+    let url = &config.get_sensor_id_url(sensor_id);
     let params = Sensor {
         sensor_type: sensor_type.to_string(),
     };
@@ -106,7 +106,7 @@ pub async fn delete_sensor(
     session_id: &str,
     sensor_id: &str,
 ) -> Result<(), Box<dyn Error>> {
-    let url = &config.sensor_id_url(sensor_id);
+    let url = &config.get_sensor_id_url(sensor_id);
 
     let (status, json, _headers) =
         send_request(client, &Method::DELETE, url, Some(session_id), None::<()>).await?;

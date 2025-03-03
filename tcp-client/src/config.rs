@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use dotenv::dotenv;
 use std::env;
 
@@ -43,7 +45,27 @@ impl Config {
         format!("{}/sensors", self.base_url)
     }
 
-    pub fn sensor_id_url(&self, sensor_id: &str) -> String {
+    pub fn get_sensor_id_url(&self, sensor_id: &str) -> String {
         format!("{}/sensors/{}", self.base_url, sensor_id)
+    }
+
+    pub fn get_sessions_url(&self) -> String {
+        format!("{}/sessions", self.base_url)
+    }
+
+    pub fn get_sessions_exp_url(&self, endpoint: &str) -> String {
+        format!("{}/sessions/{}", self.base_url, endpoint)
+    }
+
+    pub fn get_session_sensors_url(&self) -> String {
+        format!("{}/sessions-sensors", self.base_url)
+    }
+
+    pub fn get_session_sensors_id_url(&self, id: &str) -> String {
+        format!("{}/sessions-sensors/{}", self.base_url, id)
+    }
+
+    pub fn get_datapoint_url(&self) -> String {
+        format!("{}/sessions-sensors-data", self.base_url)
     }
 }
