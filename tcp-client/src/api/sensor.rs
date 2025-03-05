@@ -20,7 +20,7 @@ pub async fn create_sensor(
     session_id: &str,
     sensor_type: &str,
 ) -> Result<(), Box<dyn Error>> {
-    let url = &config.get_sensors_url();
+    let url = &config.get_sensor_url();
     let params = Sensor {
         sensor_type: sensor_type.to_string(),
     };

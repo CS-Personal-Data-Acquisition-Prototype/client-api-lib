@@ -57,10 +57,10 @@ pub async fn user_logout(
     client: &Client,
     config: &Config,
     session_id: &str,
-) -> Result<(), Box<dyn Error>> {
+) -> Result<Option<String>, Box<dyn Error>> {
     let url = &config.get_logout_url();
 
-    let (status, json, _headers) =
+    let (status, json, headers) =
         send_request(client, &Method::POST, url, Some(session_id), None::<()>).await?;
 
     println!("Response status: {}", status);
@@ -69,7 +69,15 @@ pub async fn user_logout(
         println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
     }
 
-    Ok(())
+    if let Some(cookie) = headers.get(SET_COOKIE) {
+        let cookie_str = cookie.to_str()?;
+        if let Some(session_id) = extract_session_id(cookie_str) {
+            println!("Session ID: {}", session_id);
+            return Ok(Some(session_id));
+        }
+    }
+
+    Ok(None)
 }
 
 pub async fn renew_session(

@@ -29,7 +29,10 @@ pub async fn create_user(
         send_request(client, &Method::POST, url, None, Some(&params)).await?;
 
     println!("Response status: {}", status);
-    println!("{}", serde_json::to_string_pretty(&json).unwrap());
+
+    if let Some(json_body) = json {
+        println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
+    }
 
     Ok(())
 }
@@ -45,7 +48,10 @@ pub async fn view_all_users(
         send_request(client, &Method::GET, url, Some(session_id), None::<()>).await?;
 
     println!("Response status: {}", status);
-    println!("{}", serde_json::to_string_pretty(&json).unwrap());
+
+    if let Some(json_body) = json {
+        println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
+    }
 
     Ok(())
 }
@@ -61,7 +67,10 @@ pub async fn view_user_profile(
         send_request(client, &Method::GET, url, Some(session_id), None::<()>).await?;
 
     println!("Response status: {}", status);
-    println!("{}", serde_json::to_string_pretty(&json).unwrap());
+
+    if let Some(json_body) = json {
+        println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
+    }
 
     Ok(())
 }
@@ -77,7 +86,10 @@ pub async fn view_user_by_username(
         send_request(client, &Method::GET, url, None, None::<()>).await?;
 
     println!("Response status: {}", status);
-    println!("{}", serde_json::to_string_pretty(&json).unwrap());
+
+    if let Some(json_body) = json {
+        println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
+    }
 
     Ok(())
 }
@@ -99,7 +111,10 @@ pub async fn update_user(
         send_request(client, &Method::PATCH, url, None, Some(&params)).await?;
 
     println!("Response status: {}", status);
-    println!("{}", serde_json::to_string_pretty(&json).unwrap());
+
+    if let Some(json_body) = json {
+        println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
+    }
 
     Ok(())
 }
@@ -115,7 +130,10 @@ pub async fn delete_user(
         send_request(client, &Method::DELETE, url, None, None::<()>).await?;
 
     println!("Response status: {}", status);
-    println!("{}", serde_json::to_string_pretty(&json).unwrap());
+
+    if let Some(json_body) = json {
+        println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
+    }
 
     Ok(())
 }

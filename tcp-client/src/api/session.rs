@@ -22,20 +22,13 @@ pub async fn create_session(
         username: username.to_string(),
     };
 
-    let (status, json, headers) =
+    let (status, json, _headers) =
         send_request(client, &Method::POST, url, Some(session_id), Some(&params)).await?;
 
     println!("Response status: {}", status);
 
     if let Some(json_body) = json {
         println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
-    }
-
-    if let Some(cookie) = headers.get(SET_COOKIE) {
-        let cookie_str = cookie.to_str()?;
-        if let Some(session_id) = extract_session_id(cookie_str) {
-            println!("Session ID: {}", session_id);
-        }
     }
 
     Ok(())
@@ -48,20 +41,13 @@ pub async fn view_all_sessions(
 ) -> Result<(), Box<dyn Error>> {
     let url = &config.get_sessions_url();
 
-    let (status, json, headers) =
+    let (status, json, _headers) =
         send_request(client, &Method::GET, url, Some(session_id), None::<()>).await?;
 
     println!("Response status: {}", status);
 
     if let Some(json_body) = json {
         println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
-    }
-
-    if let Some(cookie) = headers.get(SET_COOKIE) {
-        let cookie_str = cookie.to_str()?;
-        if let Some(session_id) = extract_session_id(cookie_str) {
-            println!("Session ID: {}", session_id);
-        }
     }
 
     Ok(())
@@ -73,22 +59,15 @@ pub async fn view_sessions_by_user(
     session_id: &str,
     username: &str,
 ) -> Result<(), Box<dyn Error>> {
-    let url = &config.get_sessions_exp_url(username);
+    let url = &config.get_sessions_subpath_url("user", username);
 
-    let (status, json, headers) =
+    let (status, json, _headers) =
         send_request(client, &Method::GET, url, Some(session_id), None::<()>).await?;
 
     println!("Response status: {}", status);
 
     if let Some(json_body) = json {
         println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
-    }
-
-    if let Some(cookie) = headers.get(SET_COOKIE) {
-        let cookie_str = cookie.to_str()?;
-        if let Some(session_id) = extract_session_id(cookie_str) {
-            println!("Session ID: {}", session_id);
-        }
     }
 
     Ok(())
@@ -99,22 +78,15 @@ pub async fn view_session_by_id(
     config: &Config,
     session_id: &str,
 ) -> Result<(), Box<dyn Error>> {
-    let url = &config.get_sessions_exp_url(session_id);
+    let url = &config.get_sessions_subpath_url("id", session_id);
 
-    let (status, json, headers) =
+    let (status, json, _headers) =
         send_request(client, &Method::GET, url, Some(session_id), None::<()>).await?;
 
     println!("Response status: {}", status);
 
     if let Some(json_body) = json {
         println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
-    }
-
-    if let Some(cookie) = headers.get(SET_COOKIE) {
-        let cookie_str = cookie.to_str()?;
-        if let Some(session_id) = extract_session_id(cookie_str) {
-            println!("Session ID: {}", session_id);
-        }
     }
 
     Ok(())
@@ -131,20 +103,13 @@ pub async fn update_session(
         username: username.to_string(),
     };
 
-    let (status, json, headers) =
+    let (status, json, _headers) =
         send_request(client, &Method::PATCH, url, Some(session_id), Some(&params)).await?;
 
     println!("Response status: {}", status);
 
     if let Some(json_body) = json {
         println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
-    }
-
-    if let Some(cookie) = headers.get(SET_COOKIE) {
-        let cookie_str = cookie.to_str()?;
-        if let Some(session_id) = extract_session_id(cookie_str) {
-            println!("Session ID: {}", session_id);
-        }
     }
 
     Ok(())
@@ -157,20 +122,13 @@ pub async fn delete_session(
 ) -> Result<(), Box<dyn Error>> {
     let url = &config.get_sessions_exp_url(session_id);
 
-    let (status, json, headers) =
+    let (status, json, _headers) =
         send_request(client, &Method::DELETE, url, Some(session_id), None::<()>).await?;
 
     println!("Response status: {}", status);
 
     if let Some(json_body) = json {
         println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
-    }
-
-    if let Some(cookie) = headers.get(SET_COOKIE) {
-        let cookie_str = cookie.to_str()?;
-        if let Some(session_id) = extract_session_id(cookie_str) {
-            println!("Session ID: {}", session_id);
-        }
     }
 
     Ok(())
