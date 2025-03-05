@@ -41,7 +41,7 @@ impl Config {
         format!("{}/authentication/renew", self.base_url)
     }
 
-    pub fn get_sensors_url(&self) -> String {
+    pub fn get_sensor_url(&self) -> String {
         format!("{}/sensors", self.base_url)
     }
 
@@ -57,6 +57,10 @@ impl Config {
         format!("{}/sessions/{}", self.base_url, endpoint)
     }
 
+    pub fn get_sessions_subpath_url(&self, subpath: &str, endpoint: &str) -> String {
+        format!("{}/sessions/{}/{}", self.base_url, subpath, endpoint)
+    }
+
     pub fn get_session_sensors_url(&self) -> String {
         format!("{}/sessions-sensors", self.base_url)
     }
@@ -65,7 +69,19 @@ impl Config {
         format!("{}/sessions-sensors/{}", self.base_url, id)
     }
 
+    pub fn get_session_sensors_subpath_url(&self, subpath: &str, id: &str) -> String {
+        format!("{}/sessions-sensors/{}/{}", self.base_url, subpath, id)
+    }
+
     pub fn get_datapoint_url(&self) -> String {
         format!("{}/sessions-sensors-data", self.base_url)
+    }
+
+    pub fn get_batch_url(&self) -> String {
+        format!("{}/sessions-sensors-data/batch", self.base_url)
+    }
+
+    pub fn get_datapoint_subpath_url(&self, subpath: &str, id: &str) -> String {
+        format!("{}/sessions-sensors-data/{}/{}", self.base_url, subpath, id)
     }
 }
