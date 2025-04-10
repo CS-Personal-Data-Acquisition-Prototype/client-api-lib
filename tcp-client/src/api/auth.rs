@@ -12,7 +12,7 @@ pub struct User {
     pub password_hash: String,
 }
 
-fn extract_session_id(cookie_str: &str) -> Option<String> {
+fn get_session_id(cookie_str: &str) -> Option<String> {
     for part in cookie_str.split(';') {
         if part.starts_with("session_id=") {
             return Some(part["session-id=".len()..].to_string());
@@ -44,7 +44,7 @@ pub async fn user_login(
 
     if let Some(cookie) = headers.get(SET_COOKIE) {
         let cookie_str = cookie.to_str()?;
-        if let Some(session_id) = extract_session_id(cookie_str) {
+        if let Some(session_id) = get_session_id(cookie_str) {
             println!("Session ID: {}", session_id);
             return Ok(Some(session_id));
         }
@@ -71,7 +71,7 @@ pub async fn user_logout(
 
     if let Some(cookie) = headers.get(SET_COOKIE) {
         let cookie_str = cookie.to_str()?;
-        if let Some(session_id) = extract_session_id(cookie_str) {
+        if let Some(session_id) = get_session_id(cookie_str) {
             println!("Session ID: {}", session_id);
             return Ok(Some(session_id));
         }
@@ -98,7 +98,7 @@ pub async fn renew_session(
 
     if let Some(cookie) = headers.get(SET_COOKIE) {
         let cookie_str = cookie.to_str()?;
-        if let Some(session_id) = extract_session_id(cookie_str) {
+        if let Some(session_id) = get_session_id(cookie_str) {
             println!("Session ID: {}", session_id);
             return Ok(Some(session_id));
         }

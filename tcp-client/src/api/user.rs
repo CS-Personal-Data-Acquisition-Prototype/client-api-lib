@@ -2,7 +2,8 @@
 
 use crate::config::Config;
 use crate::requests::send_request::send_request;
-use reqwest::{Client, Method};
+use reqwest::{Client, Method, StatusCode};
+use serde_json::{Value, to_string_pretty};
 use serde::Serialize;
 use std::error::Error;
 
@@ -17,7 +18,7 @@ pub async fn create_user(
     config: &Config,
     username: &str,
     pw: &str,
-) -> Result<(), Box<dyn Error>> {
+) -> Result<(StatusCode, Option<Value>), Box<dyn Error>> {
     let params = User {
         username: username.to_string(),
         password_hash: pw.to_string(),
@@ -31,17 +32,18 @@ pub async fn create_user(
     println!("Response status: {}", status);
 
     if let Some(json_body) = json {
-        println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
+        println!("{}", to_string_pretty(&json_body).unwrap());
+        Ok((status, Some(json_body)))
+    } else {
+        Ok((status, None))
     }
-
-    Ok(())
 }
 
 pub async fn view_all_users(
     client: &Client,
     config: &Config,
     session_id: &str,
-) -> Result<(), Box<dyn Error>> {
+) -> Result<(StatusCode, Option<Value>), Box<dyn Error>> {
     let url = &config.get_user_url();
 
     let (status, json, _headers) =
@@ -50,17 +52,18 @@ pub async fn view_all_users(
     println!("Response status: {}", status);
 
     if let Some(json_body) = json {
-        println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
+        println!("{}", to_string_pretty(&json_body).unwrap());
+        Ok((status, Some(json_body)))
+    } else {
+        Ok((status, None))
     }
-
-    Ok(())
 }
 
 pub async fn view_user_profile(
     client: &Client,
     config: &Config,
     session_id: &str,
-) -> Result<(), Box<dyn Error>> {
+) -> Result<(StatusCode, Option<Value>), Box<dyn Error>> {
     let url = &config.get_profile_url();
 
     let (status, json, _headers) =
@@ -69,17 +72,18 @@ pub async fn view_user_profile(
     println!("Response status: {}", status);
 
     if let Some(json_body) = json {
-        println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
+        println!("{}", to_string_pretty(&json_body).unwrap());
+        Ok((status, Some(json_body)))
+    } else {
+        Ok((status, None))
     }
-
-    Ok(())
 }
 
 pub async fn view_user_by_username(
     client: &Client,
     config: &Config,
     username: &str,
-) -> Result<(), Box<dyn Error>> {
+) -> Result<(StatusCode, Option<Value>), Box<dyn Error>> {
     let url = &config.get_username_url(username);
 
     let (status, json, _headers) =
@@ -88,10 +92,11 @@ pub async fn view_user_by_username(
     println!("Response status: {}", status);
 
     if let Some(json_body) = json {
-        println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
+        println!("{}", to_string_pretty(&json_body).unwrap());
+        Ok((status, Some(json_body)))
+    } else {
+        Ok((status, None))
     }
-
-    Ok(())
 }
 
 pub async fn update_user(
@@ -99,7 +104,7 @@ pub async fn update_user(
     config: &Config,
     username: &str,
     pw: &str,
-) -> Result<(), Box<dyn Error>> {
+) -> Result<(StatusCode, Option<Value>), Box<dyn Error>> {
     let params = User {
         username: username.to_string(),
         password_hash: pw.to_string(),
@@ -113,17 +118,18 @@ pub async fn update_user(
     println!("Response status: {}", status);
 
     if let Some(json_body) = json {
-        println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
+        println!("{}", to_string_pretty(&json_body).unwrap());
+        Ok((status, Some(json_body)))
+    } else {
+        Ok((status, None))
     }
-
-    Ok(())
 }
 
 pub async fn delete_user(
     client: &Client,
     config: &Config,
     username: &str,
-) -> Result<(), Box<dyn Error>> {
+) -> Result<(StatusCode, Option<Value>), Box<dyn Error>> {
     let url = &config.get_username_url(username);
 
     let (status, json, _headers) =
@@ -132,8 +138,9 @@ pub async fn delete_user(
     println!("Response status: {}", status);
 
     if let Some(json_body) = json {
-        println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
+        println!("{}", to_string_pretty(&json_body).unwrap());
+        Ok((status, Some(json_body)))
+    } else {
+        Ok((status, None))
     }
-
-    Ok(())
 }

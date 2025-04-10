@@ -2,8 +2,9 @@
 
 use crate::config::Config;
 use crate::requests::send_request::send_request;
-use reqwest::{Client, Method};
+use reqwest::{Client, Method, StatusCode};
 use serde::Serialize;
+use serde_json::{to_string_pretty, Value};
 use std::error::Error;
 
 #[derive(Debug, Serialize)]
@@ -25,7 +26,7 @@ pub async fn create_datapoint(
     id: &str,
     datetime: &str,
     data_blob: &str,
-) -> Result<(), Box<dyn Error>> {
+) -> Result<(StatusCode, Option<Value>), Box<dyn Error>> {
     let url = &config.get_datapoint_url();
     let params = SessionSensorData {
         id: id.to_string(),
@@ -39,10 +40,11 @@ pub async fn create_datapoint(
     println!("Response status: {}", status);
 
     if let Some(json_body) = json {
-        println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
+        println!("{}", to_string_pretty(&json_body).unwrap());
+        Ok((status, Some(json_body)))
+    } else {
+        Ok((status, None))
     }
-
-    Ok(())
 }
 
 pub async fn batch_create_datapoint(
@@ -50,7 +52,7 @@ pub async fn batch_create_datapoint(
     config: &Config,
     session_id: &str,
     datapoints: Vec<SessionSensorData>,
-) -> Result<(), Box<dyn Error>> {
+) -> Result<(StatusCode, Option<Value>), Box<dyn Error>> {
     let url = &config.get_batch_url();
     let params = Batch { datapoints };
 
@@ -60,17 +62,18 @@ pub async fn batch_create_datapoint(
     println!("Response status: {}", status);
 
     if let Some(json_body) = json {
-        println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
+        println!("{}", to_string_pretty(&json_body).unwrap());
+        Ok((status, Some(json_body)))
+    } else {
+        Ok((status, None))
     }
-
-    Ok(())
 }
 
 pub async fn view_all_datapoints(
     client: &Client,
     config: &Config,
     session_id: &str,
-) -> Result<(), Box<dyn Error>> {
+) -> Result<(StatusCode, Option<Value>), Box<dyn Error>> {
     let url = &config.get_datapoint_url();
 
     let (status, json, _headers) =
@@ -79,17 +82,18 @@ pub async fn view_all_datapoints(
     println!("Response status: {}", status);
 
     if let Some(json_body) = json {
-        println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
+        println!("{}", to_string_pretty(&json_body).unwrap());
+        Ok((status, Some(json_body)))
+    } else {
+        Ok((status, None))
     }
-
-    Ok(())
 }
 
 pub async fn view_datapoints_by_session_id(
     client: &Client,
     config: &Config,
     session_id: &str,
-) -> Result<(), Box<dyn Error>> {
+) -> Result<(StatusCode, Option<Value>), Box<dyn Error>> {
     let url = &config.get_datapoint_subpath_url("session", session_id);
 
     let (status, json, _headers) =
@@ -98,10 +102,11 @@ pub async fn view_datapoints_by_session_id(
     println!("Response status: {}", status);
 
     if let Some(json_body) = json {
-        println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
+        println!("{}", to_string_pretty(&json_body).unwrap());
+        Ok((status, Some(json_body)))
+    } else {
+        Ok((status, None))
     }
-
-    Ok(())
 }
 
 pub async fn view_datapoints_by_session_sensor(
@@ -109,7 +114,7 @@ pub async fn view_datapoints_by_session_sensor(
     config: &Config,
     session_id: &str,
     id: &str,
-) -> Result<(), Box<dyn Error>> {
+) -> Result<(StatusCode, Option<Value>), Box<dyn Error>> {
     let url = &config.get_datapoint_subpath_url("id", id);
 
     let (status, json, _headers) =
@@ -118,10 +123,11 @@ pub async fn view_datapoints_by_session_sensor(
     println!("Response status: {}", status);
 
     if let Some(json_body) = json {
-        println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
+        println!("{}", to_string_pretty(&json_body).unwrap());
+        Ok((status, Some(json_body)))
+    } else {
+        Ok((status, None))
     }
-
-    Ok(())
 }
 
 pub async fn view_datapoints_by_id_datetime(
@@ -130,7 +136,7 @@ pub async fn view_datapoints_by_id_datetime(
     session_id: &str,
     id: &str,
     datetime: &str,
-) -> Result<(), Box<dyn Error>> {
+) -> Result<(StatusCode, Option<Value>), Box<dyn Error>> {
     let url = &config.get_datapoint_subpath_url(id, datetime);
 
     let (status, json, _headers) =
@@ -139,10 +145,11 @@ pub async fn view_datapoints_by_id_datetime(
     println!("Response status: {}", status);
 
     if let Some(json_body) = json {
-        println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
+        println!("{}", to_string_pretty(&json_body).unwrap());
+        Ok((status, Some(json_body)))
+    } else {
+        Ok((status, None))
     }
-
-    Ok(())
 }
 
 pub async fn update_datapoint(
@@ -152,7 +159,7 @@ pub async fn update_datapoint(
     id: &str,
     datetime: &str,
     data_blob: &str,
-) -> Result<(), Box<dyn Error>> {
+) -> Result<(StatusCode, Option<Value>), Box<dyn Error>> {
     let url = &config.get_datapoint_subpath_url(id, datetime);
     let params = SessionSensorData {
         id: id.to_string(),
@@ -166,10 +173,11 @@ pub async fn update_datapoint(
     println!("Response status: {}", status);
 
     if let Some(json_body) = json {
-        println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
+        println!("{}", to_string_pretty(&json_body).unwrap());
+        Ok((status, Some(json_body)))
+    } else {
+        Ok((status, None))
     }
-
-    Ok(())
 }
 
 pub async fn delete_datapoint(
@@ -178,7 +186,7 @@ pub async fn delete_datapoint(
     session_id: &str,
     id: &str,
     datetime: &str,
-) -> Result<(), Box<dyn Error>> {
+) -> Result<(StatusCode, Option<Value>), Box<dyn Error>> {
     let url = &config.get_datapoint_subpath_url(id, datetime);
 
     let (status, json, _headers) =
@@ -187,8 +195,9 @@ pub async fn delete_datapoint(
     println!("Response status: {}", status);
 
     if let Some(json_body) = json {
-        println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
+        println!("{}", to_string_pretty(&json_body).unwrap());
+        Ok((status, Some(json_body)))
+    } else {
+        Ok((status, None))
     }
-
-    Ok(())
 }

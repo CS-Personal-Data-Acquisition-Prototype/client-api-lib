@@ -2,8 +2,9 @@
 
 use crate::config::Config;
 use crate::requests::send_request::send_request;
-use reqwest::{Client, Method};
+use reqwest::{Client, Method, StatusCode};
 use serde::Serialize;
+use serde_json::{to_string_pretty, Value};
 use std::error::Error;
 
 #[derive(Debug, Serialize)]
@@ -17,7 +18,7 @@ pub async fn create_session_sensor(
     config: &Config,
     session_id: &str,
     sensor_id: &str,
-) -> Result<(), Box<dyn Error>> {
+) -> Result<(StatusCode, Option<Value>), Box<dyn Error>> {
     let url = &config.get_session_sensors_url();
     let params = SessionSensor {
         session_id: session_id.to_string(),
@@ -30,17 +31,18 @@ pub async fn create_session_sensor(
     println!("Response status: {}", status);
 
     if let Some(json_body) = json {
-        println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
+        println!("{}", to_string_pretty(&json_body).unwrap());
+        Ok((status, Some(json_body)))
+    } else {
+        Ok((status, None))
     }
-
-    Ok(())
 }
 
 pub async fn view_all_sensor_sessions(
     client: &Client,
     config: &Config,
     session_id: &str,
-) -> Result<(), Box<dyn Error>> {
+) -> Result<(StatusCode, Option<Value>), Box<dyn Error>> {
     let url = &config.get_session_sensors_url();
 
     let (status, json, _headers) =
@@ -49,17 +51,18 @@ pub async fn view_all_sensor_sessions(
     println!("Response status: {}", status);
 
     if let Some(json_body) = json {
-        println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
+        println!("{}", to_string_pretty(&json_body).unwrap());
+        Ok((status, Some(json_body)))
+    } else {
+        Ok((status, None))
     }
-
-    Ok(())
 }
 
 pub async fn view_sensors_by_session_id(
     client: &Client,
     config: &Config,
     session_id: &str,
-) -> Result<(), Box<dyn Error>> {
+) -> Result<(StatusCode, Option<Value>), Box<dyn Error>> {
     let url = &config.get_session_sensors_subpath_url("session", session_id);
 
     let (status, json, _headers) =
@@ -68,10 +71,11 @@ pub async fn view_sensors_by_session_id(
     println!("Response status: {}", status);
 
     if let Some(json_body) = json {
-        println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
+        println!("{}", to_string_pretty(&json_body).unwrap());
+        Ok((status, Some(json_body)))
+    } else {
+        Ok((status, None))
     }
-
-    Ok(())
 }
 
 pub async fn view_session_sensor_by_sensor_id(
@@ -79,7 +83,7 @@ pub async fn view_session_sensor_by_sensor_id(
     config: &Config,
     session_id: &str,
     sensor_id: &str,
-) -> Result<(), Box<dyn Error>> {
+) -> Result<(StatusCode, Option<Value>), Box<dyn Error>> {
     let url = &config.get_session_sensors_subpath_url("session-sensor", sensor_id);
 
     let (status, json, _headers) =
@@ -88,10 +92,11 @@ pub async fn view_session_sensor_by_sensor_id(
     println!("Response status: {}", status);
 
     if let Some(json_body) = json {
-        println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
+        println!("{}", to_string_pretty(&json_body).unwrap());
+        Ok((status, Some(json_body)))
+    } else {
+        Ok((status, None))
     }
-
-    Ok(())
 }
 
 pub async fn update_sensor_session(
@@ -99,7 +104,7 @@ pub async fn update_sensor_session(
     config: &Config,
     session_id: &str,
     sensor_id: &str,
-) -> Result<(), Box<dyn Error>> {
+) -> Result<(StatusCode, Option<Value>), Box<dyn Error>> {
     let url = &config.get_session_sensors_id_url(sensor_id);
     let params = SessionSensor {
         session_id: session_id.to_string(),
@@ -112,10 +117,11 @@ pub async fn update_sensor_session(
     println!("Response status: {}", status);
 
     if let Some(json_body) = json {
-        println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
+        println!("{}", to_string_pretty(&json_body).unwrap());
+        Ok((status, Some(json_body)))
+    } else {
+        Ok((status, None))
     }
-
-    Ok(())
 }
 
 pub async fn delete_sensor_session(
@@ -123,7 +129,7 @@ pub async fn delete_sensor_session(
     config: &Config,
     session_id: &str,
     sensor_id: &str,
-) -> Result<(), Box<dyn Error>> {
+) -> Result<(StatusCode, Option<Value>), Box<dyn Error>> {
     let url = &config.get_session_sensors_id_url(sensor_id);
 
     let (status, json, _headers) =
@@ -132,8 +138,9 @@ pub async fn delete_sensor_session(
     println!("Response status: {}", status);
 
     if let Some(json_body) = json {
-        println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
+        println!("{}", to_string_pretty(&json_body).unwrap());
+        Ok((status, Some(json_body)))
+    } else {
+        Ok((status, None))
     }
-
-    Ok(())
 }

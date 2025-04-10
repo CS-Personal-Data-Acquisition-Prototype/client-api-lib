@@ -2,8 +2,9 @@
 
 use crate::config::Config;
 use crate::requests::send_request::send_request;
-use reqwest::{Client, Method};
+use reqwest::{Client, Method, StatusCode};
 use serde::Serialize;
+use serde_json::{to_string_pretty, Value};
 use std::error::Error;
 
 #[derive(Debug, Serialize)]
@@ -16,7 +17,7 @@ pub async fn create_session(
     config: &Config,
     session_id: &str,
     username: &str,
-) -> Result<(), Box<dyn Error>> {
+) -> Result<(StatusCode, Option<Value>), Box<dyn Error>> {
     let url = &config.get_sessions_url();
     let params = Session {
         username: username.to_string(),
@@ -28,17 +29,18 @@ pub async fn create_session(
     println!("Response status: {}", status);
 
     if let Some(json_body) = json {
-        println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
+        println!("{}", to_string_pretty(&json_body).unwrap());
+        Ok((status, Some(json_body)))
+    } else {
+        Ok((status, None))
     }
-
-    Ok(())
 }
 
 pub async fn view_all_sessions(
     client: &Client,
     config: &Config,
     session_id: &str,
-) -> Result<(), Box<dyn Error>> {
+) -> Result<(StatusCode, Option<Value>), Box<dyn Error>> {
     let url = &config.get_sessions_url();
 
     let (status, json, _headers) =
@@ -47,10 +49,11 @@ pub async fn view_all_sessions(
     println!("Response status: {}", status);
 
     if let Some(json_body) = json {
-        println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
+        println!("{}", to_string_pretty(&json_body).unwrap());
+        Ok((status, Some(json_body)))
+    } else {
+        Ok((status, None))
     }
-
-    Ok(())
 }
 
 pub async fn view_sessions_by_user(
@@ -58,7 +61,7 @@ pub async fn view_sessions_by_user(
     config: &Config,
     session_id: &str,
     username: &str,
-) -> Result<(), Box<dyn Error>> {
+) -> Result<(StatusCode, Option<Value>), Box<dyn Error>> {
     let url = &config.get_sessions_subpath_url("user", username);
 
     let (status, json, _headers) =
@@ -67,17 +70,18 @@ pub async fn view_sessions_by_user(
     println!("Response status: {}", status);
 
     if let Some(json_body) = json {
-        println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
+        println!("{}", to_string_pretty(&json_body).unwrap());
+        Ok((status, Some(json_body)))
+    } else {
+        Ok((status, None))
     }
-
-    Ok(())
 }
 
 pub async fn view_session_by_id(
     client: &Client,
     config: &Config,
     session_id: &str,
-) -> Result<(), Box<dyn Error>> {
+) -> Result<(StatusCode, Option<Value>), Box<dyn Error>> {
     let url = &config.get_sessions_subpath_url("id", session_id);
 
     let (status, json, _headers) =
@@ -86,10 +90,11 @@ pub async fn view_session_by_id(
     println!("Response status: {}", status);
 
     if let Some(json_body) = json {
-        println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
+        println!("{}", to_string_pretty(&json_body).unwrap());
+        Ok((status, Some(json_body)))
+    } else {
+        Ok((status, None))
     }
-
-    Ok(())
 }
 
 pub async fn update_session(
@@ -97,7 +102,7 @@ pub async fn update_session(
     config: &Config,
     session_id: &str,
     username: &str,
-) -> Result<(), Box<dyn Error>> {
+) -> Result<(StatusCode, Option<Value>), Box<dyn Error>> {
     let url = &config.get_sessions_exp_url(session_id);
     let params = Session {
         username: username.to_string(),
@@ -109,17 +114,18 @@ pub async fn update_session(
     println!("Response status: {}", status);
 
     if let Some(json_body) = json {
-        println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
+        println!("{}", to_string_pretty(&json_body).unwrap());
+        Ok((status, Some(json_body)))
+    } else {
+        Ok((status, None))
     }
-
-    Ok(())
 }
 
 pub async fn delete_session(
     client: &Client,
     config: &Config,
     session_id: &str,
-) -> Result<(), Box<dyn Error>> {
+) -> Result<(StatusCode, Option<Value>), Box<dyn Error>> {
     let url = &config.get_sessions_exp_url(session_id);
 
     let (status, json, _headers) =
@@ -128,8 +134,9 @@ pub async fn delete_session(
     println!("Response status: {}", status);
 
     if let Some(json_body) = json {
-        println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
+        println!("{}", to_string_pretty(&json_body).unwrap());
+        Ok((status, Some(json_body)))
+    } else {
+        Ok((status, None))
     }
-
-    Ok(())
 }
