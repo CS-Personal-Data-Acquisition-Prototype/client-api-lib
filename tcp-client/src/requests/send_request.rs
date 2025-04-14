@@ -4,7 +4,6 @@ use reqwest::{
 };
 use serde::Serialize;
 use serde_json;
-use std::error::Error;
 
 pub async fn send_request<T>(
     client: &Client,
@@ -12,7 +11,7 @@ pub async fn send_request<T>(
     url: &str,
     session_id: Option<&str>,
     body: Option<T>,
-) -> Result<(reqwest::StatusCode, Option<serde_json::Value>, HeaderMap), Box<dyn Error>>
+) -> (reqwest::StatusCode, Option<serde_json::Value>, HeaderMap)
 where
     T: Serialize,
 {
@@ -25,10 +24,14 @@ where
 
     // Add session_id header if provided
     if let Some(session_id) = session_id {
-        request = request.header(
-            COOKIE,
-            HeaderValue::from_str(&format!("session_id={}", session_id))?,
-        );
+        match HeaderValue::from_str(&format!("session_id={}", session_id)) {
+            Ok(value) => {
+                request = request.header(COOKIE, value);
+            }
+            Err(e) => {
+                eprintln!("Failed to parse session_id header: {}", e);
+            }
+        }
     }
 
     // Add request body if provided
@@ -36,16 +39,31 @@ where
         request = request.json(&body);
     }
 
-    // Send request and get status code and response body
-    let res = request.send().await?;
+    // Send request and handle all errors
+    let res = match request.send().await {
+        Ok(response) => response,
+        Err(_) => {
+            return (
+                reqwest::StatusCode::INTERNAL_SERVER_ERROR,
+                None,
+                HeaderMap::new(),
+            );
+        }
+    };
+
+    // Get status and headers from the response
     let status = res.status();
     let headers = res.headers().clone();
 
     // Receive json body if not No Content
-    if status != reqwest::StatusCode::NO_CONTENT {
-        let json: serde_json::Value = res.json().await?;
-        Ok((status, Some(json), headers))
+    let json = if status != reqwest::StatusCode::NO_CONTENT {
+        match res.json::<serde_json::Value>().await {
+            Ok(body) => Some(body),
+            Err(_) => None,
+        }
     } else {
-        Ok((status, None, headers))
-    }
+        None
+    };
+
+    (status, json, headers)
 }

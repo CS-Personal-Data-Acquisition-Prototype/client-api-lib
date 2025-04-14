@@ -1,10 +1,10 @@
 #![allow(dead_code)]
 
-use crate::config::Config;
+use crate::path::Path;
 use crate::requests::send_request::send_request;
-use reqwest::{header::SET_COOKIE, Client, Method};
+use reqwest::{header::SET_COOKIE, Client, Method, StatusCode};
 use serde::Serialize;
-use std::error::Error;
+use serde_json::Value;
 
 #[derive(Debug, Serialize)]
 pub struct User {
@@ -18,91 +18,71 @@ fn get_session_id(cookie_str: &str) -> Option<String> {
             return Some(part["session-id=".len()..].to_string());
         }
     }
+    eprintln!("Could not extract session_id");
     None
 }
 
 pub async fn user_login(
     client: &Client,
-    config: &Config,
+    path: &Path,
     username: &str,
     pw: &str,
-) -> Result<Option<String>, Box<dyn Error>> {
-    let url = &config.get_login_url();
+) -> (StatusCode, Option<Value>, Option<String>) {
+    let url = &path.get_login_url();
     let params = User {
         username: username.to_string(),
         password_hash: pw.to_string(),
     };
 
     let (status, json, headers) =
-        send_request(client, &Method::POST, url, None, Some(&params)).await?;
+        send_request(client, &Method::POST, url, None, Some(&params)).await;
 
-    println!("Response status: {}", status);
-
-    if let Some(json_body) = json {
-        println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
-    }
-
-    if let Some(cookie) = headers.get(SET_COOKIE) {
-        let cookie_str = cookie.to_str()?;
-        if let Some(session_id) = get_session_id(cookie_str) {
-            println!("Session ID: {}", session_id);
-            return Ok(Some(session_id));
+    // Get the session id from the SET_COOKIE header
+    if let Some(cookie) = headers.get(SET_COOKIE).and_then(|cookie| cookie.to_str().ok()) {
+        if let Some(new_session_id) = get_session_id(cookie) {
+            return (status, json, Some(new_session_id));
         }
     }
-
-    Ok(None)
+    // Return None if new_session_id cannot be extracted
+    (status, json, None)
 }
 
 pub async fn user_logout(
     client: &Client,
-    config: &Config,
+    path: &Path,
     session_id: &str,
-) -> Result<Option<String>, Box<dyn Error>> {
-    let url = &config.get_logout_url();
+) -> (StatusCode, Option<Value>, String) {
+    let url = &path.get_logout_url();
 
     let (status, json, headers) =
-        send_request(client, &Method::POST, url, Some(session_id), None::<()>).await?;
+        send_request(client, &Method::POST, url, Some(session_id), None::<()>).await;
 
-    println!("Response status: {}", status);
-
-    if let Some(json_body) = json {
-        println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
-    }
-
-    if let Some(cookie) = headers.get(SET_COOKIE) {
-        let cookie_str = cookie.to_str()?;
-        if let Some(session_id) = get_session_id(cookie_str) {
-            println!("Session ID: {}", session_id);
-            return Ok(Some(session_id));
+    // Get the session id from the SET_COOKIE header
+    if let Some(cookie) = headers.get(SET_COOKIE).and_then(|cookie| cookie.to_str().ok()) {
+        if let Some(new_session_id) = get_session_id(cookie) {
+            return (status, json, new_session_id);
         }
     }
-
-    Ok(None)
+    // Return old session_id if new_session_id cannot be extracted
+    (status, json, session_id.to_string())
 }
 
 pub async fn renew_session(
     client: &Client,
-    config: &Config,
+    path: &Path,
     session_id: &str,
-) -> Result<Option<String>, Box<dyn Error>> {
-    let url = &config.get_renew_url();
+) -> (StatusCode, Option<Value>, String) {
+    let url = &path.get_renew_url();
 
     let (status, json, headers) =
-        send_request(client, &Method::POST, url, Some(session_id), None::<()>).await?;
+        send_request(client, &Method::POST, url, Some(session_id), None::<()>).await;
 
-    println!("Response status: {}", status);
-
-    if let Some(json_body) = json {
-        println!("{}", serde_json::to_string_pretty(&json_body).unwrap());
-    }
-
-    if let Some(cookie) = headers.get(SET_COOKIE) {
-        let cookie_str = cookie.to_str()?;
-        if let Some(session_id) = get_session_id(cookie_str) {
-            println!("Session ID: {}", session_id);
-            return Ok(Some(session_id));
+    // Get the session id from the SET_COOKIE header
+    if let Some(cookie) = headers.get(SET_COOKIE).and_then(|cookie| cookie.to_str().ok()) {
+        if let Some(new_session_id) = get_session_id(cookie) {
+            return (status, json, new_session_id);
         }
     }
-
-    Ok(None)
+    // Return old session_id if new_session_id cannot be extracted
+    (status, json, session_id.to_string())
 }

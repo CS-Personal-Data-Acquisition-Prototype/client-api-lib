@@ -4,17 +4,17 @@ use dotenv::dotenv;
 use std::env;
 
 #[derive(Debug)]
-pub struct Config {
+pub struct Path {
     pub base_url: String,
 }
 
-impl Config {
+impl Path {
     pub fn new() -> Self {
         dotenv().ok();
         let base_url =
             env::var("API_BASE_URL").unwrap_or_else(|_| "http://127.0.0.1:7878".to_string());
 
-        Config { base_url }
+        Path { base_url }
     }
 
     pub fn get_user_url(&self) -> String {
