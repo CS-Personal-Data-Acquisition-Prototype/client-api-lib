@@ -1,5 +1,5 @@
 use reqwest::{
-    header::{HeaderMap, HeaderValue, CONTENT_TYPE, COOKIE},
+    header::{HeaderMap, HeaderValue, CONTENT_LENGTH, CONTENT_TYPE, COOKIE},
     Client, Method,
 };
 use serde::Serialize;
@@ -17,12 +17,12 @@ where
 {
     let mut request = client.request(method.clone(), url);
 
-    // Add CONTENT_TYPE header for POST and PATCH methods
+    // Add content-type header for POST and PATCH methods
     if *method == Method::POST || *method == Method::PATCH {
         request = request.header(CONTENT_TYPE, HeaderValue::from_static("application/json"));
     }
 
-    // Add session_id header if provided
+    // Add session_id in cookie header if provided
     if let Some(session_id) = session_id {
         match HeaderValue::from_str(&format!("session_id={}", session_id)) {
             Ok(value) => {
@@ -34,12 +34,20 @@ where
         }
     }
 
-    // Add request body if provided
+    // Check if there is a body to send in the request
     if let Some(body) = body {
+        // Serialize the body and get the length
+        let serialized_body = serde_json::to_vec(&body).unwrap();
+        let content_length = serialized_body.len();
+        
+        // Add content-length header
+        request = request.header(CONTENT_LENGTH, HeaderValue::from_str(&content_length.to_string()).unwrap());
+
+        // Add the json body to the request
         request = request.json(&body);
     }
 
-    // Send request and handle all errors
+    // Send request
     let res = match request.send().await {
         Ok(response) => response,
         Err(_) => {
