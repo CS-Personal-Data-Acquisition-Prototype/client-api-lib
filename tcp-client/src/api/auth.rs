@@ -1,3 +1,5 @@
+//! Requests for the authentication endpoint
+
 #![allow(dead_code)]
 
 use crate::path::Path;
@@ -6,12 +8,14 @@ use reqwest::{header::SET_COOKIE, Client, Method, StatusCode};
 use serde::Serialize;
 use serde_json::Value;
 
+/// Struct defining a user
 #[derive(Debug, Serialize)]
 pub struct User {
     pub username: String,
     pub password_hash: String,
 }
 
+/// Helper function to extract session ID from the HTTP header
 fn get_session_id(cookie_str: &str) -> Option<String> {
     for part in cookie_str.split(';') {
         if part.starts_with("session_id=") {
@@ -22,6 +26,7 @@ fn get_session_id(cookie_str: &str) -> Option<String> {
     None
 }
 
+/// Send request to attempt login with provided user credentials
 pub async fn user_login(
     client: &Client,
     path: &Path,
@@ -47,6 +52,8 @@ pub async fn user_login(
     (status, json, None)
 }
 
+
+/// Send request to log out the current user
 pub async fn user_logout(
     client: &Client,
     path: &Path,
@@ -67,6 +74,8 @@ pub async fn user_logout(
     (status, json, session_id.to_string())
 }
 
+
+/// Send request to renew session tokens
 pub async fn renew_session(
     client: &Client,
     path: &Path,

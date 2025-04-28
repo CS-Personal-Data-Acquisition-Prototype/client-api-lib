@@ -1,3 +1,5 @@
+//! Requests for the session endpoint
+
 #![allow(dead_code)]
 
 use crate::path::Path;
@@ -6,11 +8,13 @@ use reqwest::{Client, Method, StatusCode};
 use serde::Serialize;
 use serde_json::Value;
 
+/// Struct defining a session
 #[derive(Debug, Serialize)]
 pub struct Session {
     pub username: String,
 }
 
+/// Send request to create a new session
 pub async fn create_session(
     client: &Client,
     path: &Path,
@@ -28,6 +32,7 @@ pub async fn create_session(
     (status, json)
 }
 
+/// Send request to get all session
 pub async fn view_all_sessions(
     client: &Client,
     path: &Path,
@@ -41,6 +46,7 @@ pub async fn view_all_sessions(
     (status, json)
 }
 
+/// Send request to get all sessions by user
 pub async fn view_sessions_by_user(
     client: &Client,
     path: &Path,
@@ -55,6 +61,7 @@ pub async fn view_sessions_by_user(
     (status, json)
 }
 
+/// Send request to get a specific session by ID
 pub async fn view_session_by_id(
     client: &Client,
     path: &Path,
@@ -68,6 +75,7 @@ pub async fn view_session_by_id(
     (status, json)
 }
 
+/// Send request to partially or fully update a session
 pub async fn update_session(
     client: &Client,
     path: &Path,
@@ -85,6 +93,7 @@ pub async fn update_session(
     (status, json)
 }
 
+/// Send request to delete a session by ID
 pub async fn delete_session(
     client: &Client,
     path: &Path,

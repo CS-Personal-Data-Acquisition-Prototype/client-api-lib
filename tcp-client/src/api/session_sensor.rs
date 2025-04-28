@@ -1,3 +1,5 @@
+//! Requests for the session sensor endpoint
+
 #![allow(dead_code)]
 
 use crate::path::Path;
@@ -6,12 +8,14 @@ use reqwest::{Client, Method, StatusCode};
 use serde::Serialize;
 use serde_json::Value;
 
+/// Struct defining a session sensor
 #[derive(Debug, Serialize)]
 pub struct SessionSensor {
     pub session_id: String,
     pub sensor_id: String,
 }
 
+/// Send request to link a new sensor to a session
 pub async fn create_session_sensor(
     client: &Client,
     path: &Path,
@@ -30,6 +34,7 @@ pub async fn create_session_sensor(
     (status, json)
 }
 
+/// Send request to get all session sensor linkages
 pub async fn view_all_sensor_sessions(
     client: &Client,
     path: &Path,
@@ -43,6 +48,7 @@ pub async fn view_all_sensor_sessions(
     (status, json)
 }
 
+/// Send request to get all sensors linked to a specific session
 pub async fn view_sensors_by_session_id(
     client: &Client,
     path: &Path,
@@ -56,6 +62,7 @@ pub async fn view_sensors_by_session_id(
     (status, json)
 }
 
+/// Send request to get a specific session sensor linkage by sensor ID
 pub async fn view_session_sensor_by_sensor_id(
     client: &Client,
     path: &Path,
@@ -70,6 +77,7 @@ pub async fn view_session_sensor_by_sensor_id(
     (status, json)
 }
 
+/// Send request to partially or fully udpate a session sensor link
 pub async fn update_sensor_session(
     client: &Client,
     path: &Path,
@@ -88,6 +96,7 @@ pub async fn update_sensor_session(
     (status, json)
 }
 
+/// Send request to delete a session sensor linkage by ID
 pub async fn delete_sensor_session(
     client: &Client,
     path: &Path,

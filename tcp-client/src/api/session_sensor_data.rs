@@ -1,3 +1,5 @@
+//! Requests for the session sensor data endpoint
+
 #![allow(dead_code)]
 
 use crate::path::Path;
@@ -6,11 +8,13 @@ use reqwest::{Client, Method, StatusCode};
 use serde::Serialize;
 use serde_json::Value;
 
+/// Struct defining a batch of datapoints
 #[derive(Debug, Serialize)]
 pub struct Batch {
     pub datapoints: Vec<SessionSensorData>,
 }
 
+/// Struct defining a single datapoint
 #[derive(Debug, Serialize)]
 pub struct SessionSensorData {
     pub id: String,
@@ -18,6 +22,7 @@ pub struct SessionSensorData {
     pub data_blob: String,
 }
 
+/// Send request to create a new datapoint
 pub async fn create_datapoint(
     client: &Client,
     path: &Path,
@@ -39,6 +44,7 @@ pub async fn create_datapoint(
     (status, json)
 }
 
+/// Send request to batch create new datapoints
 pub async fn batch_create_datapoint(
     client: &Client,
     path: &Path,
@@ -54,6 +60,7 @@ pub async fn batch_create_datapoint(
     (status, json)
 }
 
+/// Send request to get all datapoints
 pub async fn view_all_datapoints(
     client: &Client,
     path: &Path,
@@ -67,6 +74,7 @@ pub async fn view_all_datapoints(
     (status, json)
 }
 
+/// Send request to get all datapoints linked to a given session
 pub async fn view_datapoints_by_session_id(
     client: &Client,
     path: &Path,
@@ -80,6 +88,7 @@ pub async fn view_datapoints_by_session_id(
     (status, json)
 }
 
+/// Send request to get all datapoints by session sensor ID
 pub async fn view_datapoints_by_session_sensor(
     client: &Client,
     path: &Path,
@@ -94,6 +103,7 @@ pub async fn view_datapoints_by_session_sensor(
     (status, json)
 }
 
+/// Send request to get a specific datapoint
 pub async fn view_datapoints_by_id_datetime(
     client: &Client,
     path: &Path,
@@ -109,6 +119,7 @@ pub async fn view_datapoints_by_id_datetime(
     (status, json)
 }
 
+/// Send request to partially or fully udpate a specific datapoint
 pub async fn update_datapoint(
     client: &Client,
     path: &Path,
@@ -130,6 +141,7 @@ pub async fn update_datapoint(
     (status, json)
 }
 
+/// Send request to delete a specific datapoint
 pub async fn delete_datapoint(
     client: &Client,
     path: &Path,

@@ -1,3 +1,5 @@
+//! Requests for the user endpoint
+
 #![allow(dead_code)]
 
 use crate::path::Path;
@@ -6,12 +8,14 @@ use reqwest::{Client, Method, StatusCode};
 use serde_json::Value;
 use serde::Serialize;
 
+/// Struct defining a user
 #[derive(Debug, Serialize)]
 pub struct User {
     pub username: String,
     pub password_hash: String,
 }
 
+/// Send request to create a new user
 pub async fn create_user(
     client: &Client,
     path: &Path,
@@ -31,6 +35,7 @@ pub async fn create_user(
     (status, json)
 }
 
+/// Send request to get all users
 pub async fn view_all_users(
     client: &Client,
     path: &Path,
@@ -44,6 +49,7 @@ pub async fn view_all_users(
     (status, json)
 }
 
+/// Send request to get user currently loggged in
 pub async fn view_user_profile(
     client: &Client,
     path: &Path,
@@ -57,6 +63,7 @@ pub async fn view_user_profile(
     (status, json)
 }
 
+/// Send request to get a specific user by username
 pub async fn view_user_by_username(
     client: &Client,
     path: &Path,
@@ -70,6 +77,7 @@ pub async fn view_user_by_username(
     (status, json)
 }
 
+/// Send request to partially or fully update a user
 pub async fn update_user(
     client: &Client,
     path: &Path,
@@ -89,6 +97,7 @@ pub async fn update_user(
     (status, json)
 }
 
+/// Send request to delete a user by username
 pub async fn delete_user(
     client: &Client,
     path: &Path,

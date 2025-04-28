@@ -1,3 +1,5 @@
+//! Requests for the sensor endpoint
+
 #![allow(dead_code)]
 
 use crate::path::Path;
@@ -6,12 +8,14 @@ use reqwest::{Client, Method, StatusCode};
 use serde::Serialize;
 use serde_json::Value;
 
+/// Struct defining a sensor
 #[derive(Debug, Serialize)]
 pub struct Sensor {
     #[serde(rename = "type")]
     pub sensor_type: String,
 }
 
+/// Send request to create a new sensor
 pub async fn create_sensor(
     client: &Client,
     path: &Path,
@@ -29,6 +33,7 @@ pub async fn create_sensor(
     (status, json)
 }
 
+/// Send request to get all sensors
 pub async fn view_all_sensors(
     client: &Client,
     path: &Path,
@@ -42,6 +47,7 @@ pub async fn view_all_sensors(
     (status, json)
 }
 
+/// Send request to get a specific sensor according to given ID
 pub async fn view_sensor_by_id(
     client: &Client,
     path: &Path,
@@ -56,6 +62,7 @@ pub async fn view_sensor_by_id(
     (status, json)
 }
 
+/// Send request to partially or fully update a sensor
 pub async fn update_sensor(
     client: &Client,
     path: &Path,
@@ -74,6 +81,7 @@ pub async fn update_sensor(
     (status, json)
 }
 
+/// Send request to delete a sensor according to given ID
 pub async fn delete_sensor(
     client: &Client,
     path: &Path,
