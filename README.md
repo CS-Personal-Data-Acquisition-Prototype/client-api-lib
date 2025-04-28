@@ -1,9 +1,16 @@
-Navigate into the tcp-server file in a terminal
+# client-api-lib
+A Rust library to facilitate sending and receiving requests between the web client frontend and online backend.
 
-To download packages & dependencies use: cargo build
+### Setup
+- Navigate into the tcp-client folder
+  - `cd ./tcp-client`
 
-To run the project use: cargo run
-To run in release mode: cargo run --release
+- Download all library targets
+  - `cargo build`
+
+- Run the application
+  - `cargo run`
+  
 
 # License Notice
 To apply the Apache License to your work, attach the following boilerplate notice. The text should be enclosed in the appropriate comment syntax for the file format. We also recommend that a file or class name and description of purpose be included on the same "printed page" as the copyright notice for easier identification within third-party archives.
