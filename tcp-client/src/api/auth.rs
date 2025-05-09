@@ -1,10 +1,8 @@
 //! Requests for the authentication endpoint
 
-#![allow(dead_code)]
-
-use crate::path::Path;
+use crate::path::auth;
 use crate::requests::send_request::send_request;
-use reqwest::{header::SET_COOKIE, Client, Method, StatusCode};
+use reqwest_wasm::{header::SET_COOKIE, Client, Method, StatusCode};
 use serde::Serialize;
 use serde_json::Value;
 
@@ -29,11 +27,10 @@ fn get_session_id(cookie_str: &str) -> Option<String> {
 /// Send request to attempt login with provided user credentials
 pub async fn user_login(
     client: &Client,
-    path: &Path,
     username: &str,
     pw: &str,
 ) -> (StatusCode, Option<Value>, Option<String>) {
-    let url = &path.get_login_url();
+    let url = auth::get_login_url();
     let params = User {
         username: username.to_string(),
         password_hash: pw.to_string(),
@@ -56,10 +53,9 @@ pub async fn user_login(
 /// Send request to log out the current user
 pub async fn user_logout(
     client: &Client,
-    path: &Path,
     session_id: &str,
 ) -> (StatusCode, Option<Value>, String) {
-    let url = &path.get_logout_url();
+    let url = auth::get_logout_url();
 
     let (status, json, headers) =
         send_request(client, &Method::POST, url, Some(session_id), None::<()>).await;
@@ -78,10 +74,9 @@ pub async fn user_logout(
 /// Send request to renew session tokens
 pub async fn renew_session(
     client: &Client,
-    path: &Path,
     session_id: &str,
 ) -> (StatusCode, Option<Value>, String) {
-    let url = &path.get_renew_url();
+    let url = auth::get_renew_url();
 
     let (status, json, headers) =
         send_request(client, &Method::POST, url, Some(session_id), None::<()>).await;
