@@ -1,10 +1,8 @@
 //! Requests for the session sensor data endpoint
 
-#![allow(dead_code)]
-
-use crate::path::Path;
+use crate::path::datapoint;
 use crate::requests::send_request::send_request;
-use reqwest::{Client, Method, StatusCode};
+use reqwest_wasm::{Client, Method, StatusCode};
 use serde::Serialize;
 use serde_json::Value;
 
@@ -25,13 +23,12 @@ pub struct SessionSensorData {
 /// Send request to create a new datapoint
 pub async fn create_datapoint(
     client: &Client,
-    path: &Path,
     session_id: &str,
     id: &str,
     datetime: &str,
     data_blob: &str,
 ) -> (StatusCode, Option<Value>) {
-    let url = &path.get_datapoint_url();
+    let url = datapoint::get_datapoint_url();
     let params = SessionSensorData {
         id: id.to_string(),
         datetime: datetime.to_string(),
@@ -47,11 +44,10 @@ pub async fn create_datapoint(
 /// Send request to batch create new datapoints
 pub async fn batch_create_datapoint(
     client: &Client,
-    path: &Path,
     session_id: &str,
     datapoints: Vec<SessionSensorData>,
 ) -> (StatusCode, Option<Value>) {
-    let url = &path.get_batch_url();
+    let url = datapoint::get_batch_url();
     let params = Batch { datapoints };
 
     let (status, json, _headers) =
@@ -63,10 +59,9 @@ pub async fn batch_create_datapoint(
 /// Send request to get all datapoints
 pub async fn view_all_datapoints(
     client: &Client,
-    path: &Path,
     session_id: &str,
 ) -> (StatusCode, Option<Value>) {
-    let url = &path.get_datapoint_url();
+    let url = datapoint::get_datapoint_url();
 
     let (status, json, _headers) =
         send_request(client, &Method::GET, url, Some(session_id), None::<()>).await;
@@ -77,10 +72,9 @@ pub async fn view_all_datapoints(
 /// Send request to get all datapoints linked to a given session
 pub async fn view_datapoints_by_session_id(
     client: &Client,
-    path: &Path,
     session_id: &str,
 ) -> (StatusCode, Option<Value>) {
-    let url = &path.get_datapoint_subpath_url("session", session_id);
+    let url = datapoint::get_datapoint_subpath_url("session", session_id);
 
     let (status, json, _headers) =
         send_request(client, &Method::GET, url, Some(session_id), None::<()>).await;
@@ -91,11 +85,10 @@ pub async fn view_datapoints_by_session_id(
 /// Send request to get all datapoints by session sensor ID
 pub async fn view_datapoints_by_session_sensor(
     client: &Client,
-    path: &Path,
     session_id: &str,
     id: &str,
 ) -> (StatusCode, Option<Value>) {
-    let url = &path.get_datapoint_subpath_url("id", id);
+    let url = datapoint::get_datapoint_subpath_url("id", id);
 
     let (status, json, _headers) =
         send_request(client, &Method::GET, url, Some(session_id), None::<()>).await;
@@ -106,12 +99,11 @@ pub async fn view_datapoints_by_session_sensor(
 /// Send request to get a specific datapoint
 pub async fn view_datapoints_by_id_datetime(
     client: &Client,
-    path: &Path,
     session_id: &str,
     id: &str,
     datetime: &str,
 ) -> (StatusCode, Option<Value>) {
-    let url = &path.get_datapoint_subpath_url(id, datetime);
+    let url = datapoint::get_datapoint_subpath_url(id, datetime);
 
     let (status, json, _headers) =
         send_request(client, &Method::GET, url, Some(session_id), None::<()>).await;
@@ -122,13 +114,12 @@ pub async fn view_datapoints_by_id_datetime(
 /// Send request to partially or fully udpate a specific datapoint
 pub async fn update_datapoint(
     client: &Client,
-    path: &Path,
     session_id: &str,
     id: &str,
     datetime: &str,
     data_blob: &str,
 ) -> (StatusCode, Option<Value>) {
-    let url = &path.get_datapoint_subpath_url(id, datetime);
+    let url = datapoint::get_datapoint_subpath_url(id, datetime);
     let params = SessionSensorData {
         id: id.to_string(),
         datetime: datetime.to_string(),
@@ -144,12 +135,11 @@ pub async fn update_datapoint(
 /// Send request to delete a specific datapoint
 pub async fn delete_datapoint(
     client: &Client,
-    path: &Path,
     session_id: &str,
     id: &str,
     datetime: &str,
 ) -> (StatusCode, Option<Value>) {
-    let url = &path.get_datapoint_subpath_url(id, datetime);
+    let url = datapoint::get_datapoint_subpath_url(id, datetime);
 
     let (status, json, _headers) =
         send_request(client, &Method::DELETE, url, Some(session_id), None::<()>).await;
