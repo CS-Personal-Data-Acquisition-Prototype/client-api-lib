@@ -12,6 +12,13 @@ pub struct Session {
     pub username: String,
 }
 
+/// Struct defining a session for PATCH
+#[derive(Debug, Serialize)]
+pub struct PatchSession {
+    pub id: String,
+    pub username: String,
+}
+
 /// Send request to create a new session
 pub async fn create_session(
     client: &Client,
@@ -76,7 +83,8 @@ pub async fn update_session(
     username: &str,
 ) -> (StatusCode, Option<Value>) {
     let url = session::get_sessions_exp_url(session_id);
-    let params = Session {
+    let params = PatchSession {
+        id: session_id.to_string(),
         username: username.to_string(),
     };
 

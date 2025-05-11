@@ -13,6 +13,14 @@ pub struct Sensor {
     pub sensor_type: String,
 }
 
+/// Struct defining a sensor for PATCH
+#[derive(Debug, Serialize)]
+pub struct PatchSensor {
+    pub id: String,
+    #[serde(rename = "type")]
+    pub sensor_type: String,
+}
+
 /// Send request to create a new sensor
 pub async fn create_sensor(
     client: &Client,
@@ -65,7 +73,8 @@ pub async fn update_sensor(
     sensor_type: &str,
 ) -> (StatusCode, Option<Value>) {
     let url = sensor::get_sensor_id_url(sensor_id);
-    let params = Sensor {
+    let params = PatchSensor {
+        id: sensor_id.to_string(),
         sensor_type: sensor_type.to_string(),
     };
 
