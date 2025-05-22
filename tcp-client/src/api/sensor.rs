@@ -47,9 +47,9 @@ pub async fn view_all_sensors(
 pub async fn view_sensor_by_id(
     client: &Client,
     session_id: &str,
-    sensor_id: &str,
+    id: &str,
 ) -> (StatusCode, Option<Value>) {
-    let url = sensor::get_sensor_id_url(sensor_id);
+    let url = sensor::get_sensor_id_url(id);
 
     let (status, json, _headers) =
         send_request(client, &Method::GET, url, Some(session_id), None::<()>).await;
@@ -61,10 +61,10 @@ pub async fn view_sensor_by_id(
 pub async fn update_sensor(
     client: &Client,
     session_id: &str,
-    sensor_id: &str,
+    id: &str,
     sensor_type: &str,
 ) -> (StatusCode, Option<Value>) {
-    let url = sensor::get_sensor_id_url(sensor_id);
+    let url = sensor::get_sensor_id_url(id);
     let params = Sensor {
         sensor_type: sensor_type.to_string(),
     };
@@ -79,9 +79,9 @@ pub async fn update_sensor(
 pub async fn delete_sensor(
     client: &Client,
     session_id: &str,
-    sensor_id: &str,
+    id: &str,
 ) -> (StatusCode, Option<Value>) {
-    let url = sensor::get_sensor_id_url(sensor_id);
+    let url = sensor::get_sensor_id_url(id);
 
     let (status, json, _headers) =
         send_request(client, &Method::DELETE, url, Some(session_id), None::<()>).await;

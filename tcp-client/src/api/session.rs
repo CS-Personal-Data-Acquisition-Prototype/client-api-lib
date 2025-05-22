@@ -1,5 +1,7 @@
 //! Requests for the session endpoint
 
+//session id disabled for temporary solution
+
 use crate::path::session;
 use crate::requests::send_request::send_request;
 use reqwest_wasm::{Client, Method, StatusCode};
@@ -9,22 +11,24 @@ use serde_json::Value;
 /// Struct defining a session
 #[derive(Debug, Serialize)]
 pub struct Session {
+    //pub id: String,
     pub username: String,
 }
 
 /// Send request to create a new session
 pub async fn create_session(
     client: &Client,
-    session_id: &str,
+    //id: &str,
     username: &str,
 ) -> (StatusCode, Option<Value>) {
     let url = session::get_sessions_url();
     let params = Session {
+        //id: id.to_string(),
         username: username.to_string(),
     };
 
     let (status, json, _headers) =
-        send_request(client, &Method::POST, url, Some(session_id), Some(&params)).await;
+        send_request(client, &Method::POST, url, None, Some(&params)).await;
 
     (status, json)
 }
@@ -32,12 +36,11 @@ pub async fn create_session(
 /// Send request to get all session
 pub async fn view_all_sessions(
     client: &Client,
-    session_id: &str,
 ) -> (StatusCode, Option<Value>) {
     let url = session::get_sessions_url();
 
     let (status, json, _headers) =
-        send_request(client, &Method::GET, url, Some(session_id), None::<()>).await;
+        send_request(client, &Method::GET, url, None, None::<()>).await;
 
     (status, json)
 }
@@ -45,13 +48,12 @@ pub async fn view_all_sessions(
 /// Send request to get all sessions by user
 pub async fn view_sessions_by_user(
     client: &Client,
-    session_id: &str,
     username: &str,
 ) -> (StatusCode, Option<Value>) {
     let url = session::get_sessions_subpath_url("user", username);
 
     let (status, json, _headers) =
-        send_request(client, &Method::GET, url, Some(session_id), None::<()>).await;
+        send_request(client, &Method::GET, url, None, None::<()>).await;
 
     (status, json)
 }
@@ -59,12 +61,12 @@ pub async fn view_sessions_by_user(
 /// Send request to get a specific session by ID
 pub async fn view_session_by_id(
     client: &Client,
-    session_id: &str,
+    id: &str,
 ) -> (StatusCode, Option<Value>) {
-    let url = session::get_sessions_subpath_url("id", session_id);
+    let url = session::get_sessions_subpath_url("id", id);
 
     let (status, json, _headers) =
-        send_request(client, &Method::GET, url, Some(session_id), None::<()>).await;
+        send_request(client, &Method::GET, url, Some(id), None::<()>).await;
 
     (status, json)
 }
@@ -72,16 +74,17 @@ pub async fn view_session_by_id(
 /// Send request to partially or fully update a session
 pub async fn update_session(
     client: &Client,
-    session_id: &str,
+    id: &str,
     username: &str,
 ) -> (StatusCode, Option<Value>) {
-    let url = session::get_sessions_exp_url(session_id);
+    let url = session::get_sessions_exp_url(id);
     let params = Session {
+        //id: id.to_string(),
         username: username.to_string(),
     };
 
     let (status, json, _headers) =
-        send_request(client, &Method::PATCH, url, Some(session_id), Some(&params)).await;
+        send_request(client, &Method::PATCH, url, Some(id), Some(&params)).await;
 
     (status, json)
 }
@@ -89,12 +92,12 @@ pub async fn update_session(
 /// Send request to delete a session by ID
 pub async fn delete_session(
     client: &Client,
-    session_id: &str,
+    id: &str,
 ) -> (StatusCode, Option<Value>) {
-    let url = session::get_sessions_exp_url(session_id);
+    let url = session::get_sessions_exp_url(id);
 
     let (status, json, _headers) =
-        send_request(client, &Method::DELETE, url, Some(session_id), None::<()>).await;
+        send_request(client, &Method::DELETE, url, Some(id), None::<()>).await;
 
     (status, json)
 }
