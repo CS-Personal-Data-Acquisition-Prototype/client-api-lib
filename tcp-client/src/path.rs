@@ -108,4 +108,9 @@ pub mod datapoint {
         let base_url = get_base_url();
         format!("{}/sessions-sensors-data/{}/{}", base_url, subpath, id)
     }
+
+    pub fn get_datapoint_datetime_url(id: &str, datetime: &str) -> String {
+        let base_url = get_base_url();
+        format!("{}/sessions-sensors-data/session/{}/{}", base_url, id, datetime)
+    }
 }
