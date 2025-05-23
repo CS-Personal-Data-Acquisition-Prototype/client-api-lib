@@ -13,6 +13,7 @@ A Rust library to facilitate sending and receiving requests between the web clie
 
 Note: This repository is meant to be used as an external crate for the UI layer. Running the application as is will not send any requests.
 
+
 ### External Crate Usage
 For use as an external crate, first specify the IP address and port number where all requests should be sent to in the `.env` file located under `client-api-lib/tcp-client`. Example usage with localhost and Port 80:
 ```
@@ -26,13 +27,13 @@ tcp-client = { path = "path/to/client-api-lib/tcp-client" }
 ```
 
 In all relevant files, include the API as an external crate and import the needed endpoints.
-```
+```rust
 extern crate client;
 use client::api::{auth, sensor, sensor_session_data, session_sensor, session, user};
 ```
 
 All requests to the server require an HTTP Client, which can be retrieved by calling `get_client()` and used for all subsequent requests.
-```
+```rust
 let client = client::get_client();
 let (status, body) = user::create_user(&client, &username, &password).await;
 ```
