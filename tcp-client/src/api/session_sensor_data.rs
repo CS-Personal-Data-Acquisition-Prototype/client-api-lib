@@ -111,6 +111,20 @@ pub async fn view_datapoints_by_id_datetime(
     (status, json)
 }
 
+/// Send request to get all datapoints after specific datetime
+pub async fn view_all_datapoints_by_id_datetime(
+    client: &Client,
+    session_id: &str,
+    datetime: &str,
+) -> (StatusCode, Option<Value>) {
+    let url = datapoint::get_datapoint_datetime_url(session_id, datetime);
+
+    let (status, json, _headers) =
+        send_request(client, &Method::GET, url, Some(session_id), None::<()>).await;
+
+    (status, json)
+}
+
 /// Send request to partially or fully udpate a specific datapoint
 pub async fn update_datapoint(
     client: &Client,
