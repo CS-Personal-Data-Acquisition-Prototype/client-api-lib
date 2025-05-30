@@ -13,6 +13,14 @@ pub struct SessionSensor {
     pub sensor_id: String,
 }
 
+/// Struct defining a session sensor for PATCH
+#[derive(Debug, Serialize)]
+pub struct PatchSessionSensor {
+    pub id: String,
+    pub session_id: String,
+    pub sensor_id: String,
+}
+
 /// Send request to link a new sensor to a session
 pub async fn create_session_sensor(
     client: &Client,
@@ -74,11 +82,13 @@ pub async fn view_session_sensor_by_sensor_id(
 /// Send request to partially or fully udpate a session sensor link
 pub async fn update_sensor_session(
     client: &Client,
+    session_sensor_id: &str,
     session_id: &str,
     sensor_id: &str,
 ) -> (StatusCode, Option<Value>) {
-    let url = session::get_session_sensors_id_url(sensor_id);
-    let params = SessionSensor {
+    let url = session::get_session_sensors_id_url(session_sensor_id);
+    let params = PatchSessionSensor {
+        id: session_sensor_id.to_string(),
         session_id: session_id.to_string(),
         sensor_id: sensor_id.to_string(),
     };

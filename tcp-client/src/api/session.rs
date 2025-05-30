@@ -15,6 +15,13 @@ pub struct Session {
     pub username: String,
 }
 
+/// Struct defining a session for PATCH
+// #[derive(Debug, Serialize)]
+// pub struct PatchSession {
+//     pub id: String,
+//     pub username: String,
+// }
+
 /// Send request to create a new session
 pub async fn create_session(
     client: &Client,

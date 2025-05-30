@@ -13,6 +13,14 @@ pub struct Sensor {
     pub sensor_type: String,
 }
 
+/// Struct defining a sensor for PATCH
+// #[derive(Debug, Serialize)]
+// pub struct PatchSensor {
+//     pub id: String,
+//     #[serde(rename = "type")]
+//     pub sensor_type: String,
+// }
+
 /// Send request to create a new sensor
 pub async fn create_sensor(
     client: &Client,
