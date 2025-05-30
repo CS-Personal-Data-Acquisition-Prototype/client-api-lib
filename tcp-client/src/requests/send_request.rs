@@ -1,3 +1,5 @@
+/// Main logic for building and sending requests to the TCP server
+
 use reqwest_wasm::{
     header::{HeaderMap, HeaderValue, CONTENT_LENGTH, CONTENT_TYPE, COOKIE},
     Client, Method,
@@ -46,6 +48,7 @@ where
         // Add the json body to the request
         request = request.json(&body);
     } else {
+        // Set content length to zero if there is no body
         request = request.header(CONTENT_LENGTH, 0);
     }
 
@@ -54,6 +57,7 @@ where
         Ok(response) => response,
         Err(_) => {
             return (
+                // Return an internal server error if sending the request fails
                 reqwest_wasm::StatusCode::INTERNAL_SERVER_ERROR,
                 None,
                 HeaderMap::new(),
@@ -75,5 +79,6 @@ where
         None
     };
 
+    // Return the response status, body, and headers
     (status, json, headers)
 }

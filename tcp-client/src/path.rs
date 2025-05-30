@@ -1,10 +1,12 @@
 use std::env;
 
+/// Get the API base URL from an environment variable
 fn get_base_url() -> String {
     dotenv::dotenv().ok();
     env::var("API_BASE_URL").unwrap_or_else(|_| "http://127.0.0.1:7878".to_string())
 }
 
+/// Module for obtaining User related endpoint URLs
 pub mod user {
     use super::get_base_url;
 
@@ -24,6 +26,7 @@ pub mod user {
     }
 }
 
+/// Module for obtaining authentication related endpoint URLs
 pub mod auth {
     use super::get_base_url;
 
@@ -43,6 +46,7 @@ pub mod auth {
     }
 }
 
+/// Module for obtaining sensor related endpoint URLs
 pub mod sensor {
     use super::get_base_url;
 
@@ -57,6 +61,7 @@ pub mod sensor {
     }
 }
 
+/// Module for obtaining session related endpoint URLs
 pub mod session {
     use super::get_base_url;
 
@@ -91,6 +96,7 @@ pub mod session {
     }
 }
 
+/// Module for obtaining datapoint related endpoint URLs
 pub mod datapoint {
     use super::get_base_url;
 
@@ -107,5 +113,10 @@ pub mod datapoint {
     pub fn get_datapoint_subpath_url(subpath: &str, id: &str) -> String {
         let base_url = get_base_url();
         format!("{}/sessions-sensors-data/{}/{}", base_url, subpath, id)
+    }
+
+    pub fn get_datapoint_datetime_url(id: &str, datetime: &str) -> String {
+        let base_url = get_base_url();
+        format!("{}/sessions-sensors-data/session/{}/{}", base_url, id, datetime)
     }
 }
