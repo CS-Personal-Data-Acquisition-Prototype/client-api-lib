@@ -1,4 +1,6 @@
-use reqwest::{
+/// Main logic for building and sending requests to the TCP server
+
+use reqwest_wasm::{
     header::{HeaderMap, HeaderValue, CONTENT_LENGTH, CONTENT_TYPE, COOKIE},
     Client, Method,
 };
@@ -8,10 +10,10 @@ use serde_json;
 pub async fn send_request<T>(
     client: &Client,
     method: &Method,
-    url: &str,
+    url: String,
     session_id: Option<&str>,
     body: Option<T>,
-) -> (reqwest::StatusCode, Option<serde_json::Value>, HeaderMap)
+) -> (reqwest_wasm::StatusCode, Option<serde_json::Value>, HeaderMap)
 where
     T: Serialize,
 {
@@ -45,6 +47,9 @@ where
 
         // Add the json body to the request
         request = request.json(&body);
+    } else {
+        // Set content length to zero if there is no body
+        request = request.header(CONTENT_LENGTH, 0);
     }
 
     // Send request
@@ -52,7 +57,8 @@ where
         Ok(response) => response,
         Err(_) => {
             return (
-                reqwest::StatusCode::INTERNAL_SERVER_ERROR,
+                // Return an internal server error if sending the request fails
+                reqwest_wasm::StatusCode::INTERNAL_SERVER_ERROR,
                 None,
                 HeaderMap::new(),
             );
@@ -64,7 +70,7 @@ where
     let headers = res.headers().clone();
 
     // Receive json body if not No Content
-    let json = if status != reqwest::StatusCode::NO_CONTENT {
+    let json = if status != reqwest_wasm::StatusCode::NO_CONTENT {
         match res.json::<serde_json::Value>().await {
             Ok(body) => Some(body),
             Err(_) => None,
@@ -73,5 +79,6 @@ where
         None
     };
 
+    // Return the response status, body, and headers
     (status, json, headers)
 }
